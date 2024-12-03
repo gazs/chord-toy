@@ -30,13 +30,27 @@ body {
   margin: 0;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+
+.note {
+  border: 1px solid black;
+  width: 20px;
+  height: 40px;
+}
+.note.is-pressed {
+  background: black;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.row {
+  display: flex;
+  gap: 10px;
+}
+.keyboard {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+button.start {
+  width: 200px;
+  height: 200px;
 }
