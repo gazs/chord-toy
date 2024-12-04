@@ -1,8 +1,8 @@
-import Keyboard from "./components/Keyboard";
+import TheSynth from "./components/TheSynth";
 
 export default function Home() {
 
   return (
-    <Keyboard/>
+    <TheSynth />
   );
 }

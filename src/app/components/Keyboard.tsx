@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import classNames from "classnames";
 import * as Tone from "tone";
 import { Chord } from "tonal";
+import Strumplate from "./Strumplate";
 
 const keyboard = [
   [
@@ -53,64 +54,49 @@ const keyboard = [
 const rows = ["major", "minor", "major seventh"];
 const notes = ["Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#"];
 
-const keyCodeToNote = (code: string) => {
+const keyCodeToNote = (code?: string) => {
   for (const row in keyboard) {
     const index = keyboard[row].findIndex((keycode) => code === keycode);
     if (index > -1) {
       return { note: notes[index], chordType: rows[row] };
     }
   }
+
+  return {
+    note: undefined,
+    chordType: undefined,
+  };
 };
 
 export default function Keyboard() {
   const [started, setStarted] = useState(false);
-  const [pressedKeys, setPressedKeys] = useState(new Set());
+  const [pressedKey, setPressedKey] = useState();
 
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
-  const keydownListener = useCallback(
-    (event) => {
-      for (const row in keyboard) {
-        if (keyboard[row].includes(event.code)) {
+  const keydownListener = useCallback((event) => {
+    setPressedKey(event.code);
+  }, []);
+
+  const keyupListener = useCallback((event) => {
+    setPressedKey(undefined);
+  }, []);
+
+  const { chordType, note } = keyCodeToNote(pressedKey);
+
+  useEffect(() => {
+    if (synthRef.current) {
+      synthRef.current.releaseAll();
+
+      if (chordType && note) {
+        const notes = Chord.notes(chordType, note);
+
+        for (const note of notes) {
+        //   synthRef.current.triggerAttack(`${note}4`);
         }
       }
-
-      const pressedKey = event.code;
-
-      const { chordType, note } = keyCodeToNote(pressedKey);
-
-      const notes = Chord.notes(chordType, note);
-
-      for (const note of notes) {
-        synthRef.current?.triggerAttack(`${note}4`);
-      }
-
-      const newKeys = new Set(pressedKeys);
-      newKeys.add(pressedKey);
-      setPressedKeys(newKeys);
-    },
-    [pressedKeys]
-  );
-
-  const keyupListener = useCallback(
-    (event) => {
-      const liftedKey = event.code;
-
-      const newKeys = new Set(pressedKeys);
-
-      const { chordType, note } = keyCodeToNote(liftedKey);
-
-      const notes = Chord.notes(chordType, note);
-
-      for (const note of notes) {
-        synthRef.current?.triggerRelease(`${note}4`);
-      }
-
-      newKeys.delete(liftedKey);
-      setPressedKeys(newKeys);
-    },
-    [pressedKeys]
-  );
+    }
+  }, [chordType, note, pressedKey]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownListener);
@@ -120,7 +106,7 @@ export default function Keyboard() {
       document.removeEventListener("keydown", keydownListener);
       document.removeEventListener("keyup", keyupListener);
     };
-  }, [keydownListener, keyupListener, pressedKeys]);
+  }, [keydownListener, keyupListener]);
 
   useEffect(() => {
     if (started) {
@@ -143,33 +129,50 @@ export default function Keyboard() {
     setStarted(true);
   };
 
-  return (
-    <div>
-      <button onClick={onStart} className="start">
-        start
-      </button>
+  const onSegmentStrum = (i: number) => {
+    if (synthRef.current && chordType && note) {
+      const degrees = Chord.degrees(chordType, `${note}4`);
 
-      <div className="keyboard">
-        {keyboard.map((keyboardRow, rowIndex) => (
-          <div key={rowIndex} className="row">
-            <div>{rows[rowIndex]}</div>
-            {keyboardRow.map((key, noteIndex) => {
-              const myCode = keyboard[rowIndex][noteIndex];
-              const isPressed = pressedKeys.has(myCode);
-              return (
-                <div
-                  key={key}
-                  className={classNames("note", { "is-pressed": isPressed })}
-                  onTouchStart={() => keydownListener({ code: myCode })}
-                  onTouchEnd={() => keyupListener({ code: myCode })}
-                  onMouseDown={() => keydownListener({ code: myCode })}
-                  onMouseUp={() => keyupListener({ code: myCode })}
-                />
-              );
-            })}
-          </div>
-        ))}
+      console.log(degrees(i+1))
+      synthRef.current.triggerAttackRelease(degrees(i), "16n");
+    }
+  };
+
+  return (
+    <div className="synth">
+      {!started && (
+        <button onClick={onStart} className="start">
+          start
+        </button>
+      )}
+
+      <div>
+        <div className="keyboard">
+          {notes.map((note) => (
+            <div key={note}>{note}</div>
+          ))}
+          {keyboard.map((keyboardRow, rowIndex) => (
+            <div key={rowIndex} className="row">
+              <div>{rows[rowIndex]}</div>
+              {keyboardRow.map((key, noteIndex) => {
+                const myCode = keyboard[rowIndex][noteIndex];
+                const isPressed = myCode === pressedKey;
+                return (
+                  <div
+                    key={key}
+                    className={classNames("key", { "is-pressed": isPressed })}
+                    onTouchStart={() => keydownListener({ code: myCode })}
+                    onTouchEnd={() => keyupListener({ code: myCode })}
+                    onMouseDown={() => keydownListener({ code: myCode })}
+                    onMouseUp={() => keyupListener({ code: myCode })}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
+      <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
     </div>
   );
 }
