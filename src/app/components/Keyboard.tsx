@@ -54,6 +54,21 @@ const keyboard = [
 const rows = ["major", "minor", "major seventh"];
 const notes = ["Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#"];
 
+const keyboard2 = [
+  ["Digit1", "KeyQ", "KeyA"],
+  ["Digit2", "KeyW", "KeyS"],
+  ["Digit3", "KeyE", "KeyD"],
+  ["Digit4", "KeyR", "KeyF"],
+  ["Digit5", "KeyT", "KeyG"],
+  ["Digit6", "KeyY", "KeyH"],
+  ["Digit7", "KeyU", "KeyJ"],
+  ["Digit8", "KeyI", "KeyK"],
+  ["Digit9", "KeyO", "KeyL"],
+  ["Digit0", "KeyP", "Semicolon"],
+  ["Minus", "BracketLeft", "Quote"],
+  ["Equal", "BracketRight", "Backslash"],
+];
+
 const keyCodeToNote = (code?: string) => {
   for (const row in keyboard) {
     const index = keyboard[row].findIndex((keycode) => code === keycode);
@@ -92,7 +107,7 @@ export default function Keyboard() {
         const notes = Chord.notes(chordType, note);
 
         for (const note of notes) {
-        //   synthRef.current.triggerAttack(`${note}4`);
+          //   synthRef.current.triggerAttack(`${note}4`);
         }
       }
     }
@@ -133,8 +148,7 @@ export default function Keyboard() {
     if (synthRef.current && chordType && note) {
       const degrees = Chord.degrees(chordType, `${note}4`);
 
-      console.log(degrees(i+1))
-      synthRef.current.triggerAttackRelease(degrees(i), "16n");
+      synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
     }
   };
 
@@ -146,20 +160,20 @@ export default function Keyboard() {
         </button>
       )}
 
-      <div>
-        <div className="keyboard">
+      <div className="keyboard2">
+        <div className="heading">
           {notes.map((note) => (
             <div key={note}>{note}</div>
           ))}
-          {keyboard.map((keyboardRow, rowIndex) => (
-            <div key={rowIndex} className="row">
-              <div>{rows[rowIndex]}</div>
-              {keyboardRow.map((key, noteIndex) => {
-                const myCode = keyboard[rowIndex][noteIndex];
-                const isPressed = myCode === pressedKey;
+        </div>
+        <div className="body">
+          {keyboard2.map((column, i) => (
+            <div className="column" key={i}>
+              {column.map((key) => {
+                const isPressed = pressedKey == key;
+
                 return (
                   <div
-                    key={key}
                     className={classNames("key", { "is-pressed": isPressed })}
                     onTouchStart={() => keydownListener({ code: myCode })}
                     onTouchEnd={() => keyupListener({ code: myCode })}
