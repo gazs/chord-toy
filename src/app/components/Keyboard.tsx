@@ -85,15 +85,15 @@ const keyCodeToNote = (code?: string) => {
 
 export default function Keyboard() {
   const [started, setStarted] = useState(false);
-  const [pressedKey, setPressedKey] = useState();
+  const [pressedKey, setPressedKey] = useState<string | undefined>();
 
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
-  const keydownListener = useCallback((event) => {
+  const keydownListener = useCallback((event: { code: string }) => {
     setPressedKey(event.code);
   }, []);
 
-  const keyupListener = useCallback((event) => {
+  const keyupListener = useCallback((event: { code: string }) => {
     setPressedKey(undefined);
   }, []);
 
@@ -174,11 +174,12 @@ export default function Keyboard() {
 
                 return (
                   <div
+                    key={key}
                     className={classNames("key", { "is-pressed": isPressed })}
-                    onTouchStart={() => keydownListener({ code: myCode })}
-                    onTouchEnd={() => keyupListener({ code: myCode })}
-                    onMouseDown={() => keydownListener({ code: myCode })}
-                    onMouseUp={() => keyupListener({ code: myCode })}
+                    onTouchStart={() => keydownListener({ code: key })}
+                    onTouchEnd={() => keyupListener({ code: key })}
+                    onMouseDown={() => keydownListener({ code: key })}
+                    onMouseUp={() => keyupListener({ code: key })}
                   />
                 );
               })}
