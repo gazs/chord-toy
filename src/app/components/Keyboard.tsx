@@ -85,6 +85,7 @@ const keyCodeToNote = (code?: string) => {
 
 export default function Keyboard() {
   const [started, setStarted] = useState(false);
+  const [organ, setOrgan] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | undefined>();
 
   const synthRef = useRef<Tone.PolySynth | null>(null);
@@ -93,7 +94,7 @@ export default function Keyboard() {
     setPressedKey(event.code);
   }, []);
 
-  const keyupListener = useCallback((_event: { code: string}) => {
+  const keyupListener = useCallback((_event: { code: string }) => {
     setPressedKey(undefined);
   }, []);
 
@@ -103,12 +104,12 @@ export default function Keyboard() {
     if (synthRef.current) {
       synthRef.current.releaseAll();
 
-      if (chordType && note) {
-        // const notes = Chord.notes(chordType, note);
+      if (chordType && note && organ) {
+        const notes = Chord.notes(chordType, note);
 
-        // for (const note of notes) {
-        //   synthRef.current.triggerAttack(`${note}4`);
-        // }
+        for (const note of notes) {
+          synthRef.current.triggerAttack(`${note}4`);
+        }
       }
     }
   }, [chordType, note, pressedKey]);
@@ -153,41 +154,52 @@ export default function Keyboard() {
   };
 
   return (
-    <div className="synth">
-      {!started && (
-        <button onClick={onStart} className="start">
-          start
-        </button>
-      )}
+    <>
+      <label>
+        <input
+          type="checkbox"
+          checked={organ}
+          onChange={(e) => setOrgan(e.target.checked)}
+        />
+        organ
+      </label>
 
-      <div className="keyboard2">
-        <div className="heading">
-          {notes.map((note) => (
-            <div key={note}>{note}</div>
-          ))}
-        </div>
-        <div className="body">
-          {keyboard2.map((column, i) => (
-            <div className="column" key={i}>
-              {column.map((key) => {
-                const isPressed = pressedKey == key;
+      <div className="synth">
+        {!started && (
+          <button onClick={onStart} className="start">
+            start
+          </button>
+        )}
 
-                return (
-                  <div
-                    key={key}
-                    className={classNames("key", { "is-pressed": isPressed })}
-                    onTouchStart={() => keydownListener({ code: key })}
-                    onTouchEnd={() => keyupListener({ code: key })}
-                    onMouseDown={() => keydownListener({ code: key })}
-                    onMouseUp={() => keyupListener({ code: key })}
-                  />
-                );
-              })}
-            </div>
-          ))}
+        <div className="keyboard2">
+          <div className="heading">
+            {notes.map((note) => (
+              <div key={note}>{note}</div>
+            ))}
+          </div>
+          <div className="body">
+            {keyboard2.map((column, i) => (
+              <div className="column" key={i}>
+                {column.map((key) => {
+                  const isPressed = pressedKey == key;
+
+                  return (
+                    <div
+                      key={key}
+                      className={classNames("key", { "is-pressed": isPressed })}
+                      onTouchStart={() => keydownListener({ code: key })}
+                      onTouchEnd={() => keyupListener({ code: key })}
+                      onMouseDown={() => keydownListener({ code: key })}
+                      onMouseUp={() => keyupListener({ code: key })}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
+        <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
       </div>
-      <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
-    </div>
+    </>
   );
 }
