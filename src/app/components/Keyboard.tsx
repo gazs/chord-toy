@@ -93,7 +93,7 @@ export default function Keyboard() {
     setPressedKey(event.code);
   }, []);
 
-  const keyupListener = useCallback((event: { code: string }) => {
+  const keyupListener = useCallback((_event: { code: string}) => {
     setPressedKey(undefined);
   }, []);
 
@@ -104,11 +104,11 @@ export default function Keyboard() {
       synthRef.current.releaseAll();
 
       if (chordType && note) {
-        const notes = Chord.notes(chordType, note);
+        // const notes = Chord.notes(chordType, note);
 
-        for (const note of notes) {
-          //   synthRef.current.triggerAttack(`${note}4`);
-        }
+        // for (const note of notes) {
+        //   synthRef.current.triggerAttack(`${note}4`);
+        // }
       }
     }
   }, [chordType, note, pressedKey]);
