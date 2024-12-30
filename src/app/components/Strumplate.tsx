@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import clamp from "lodash/clamp";
-import { throttle } from "lodash";
 
 export default function Strumplate({
   onSegmentStrum,
@@ -11,8 +10,10 @@ export default function Strumplate({
 }) {
   const numSegments = 3 * 4 + 1;
 
+  const lastStrummedSegment = useRef<number | null>(null);
+
   const rect = useRef<DOMRect>();
-  const strumplateDiv = useRef<HTMLDivElement>();
+  const strumplateDiv = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (strumplateDiv.current) {
@@ -20,29 +21,28 @@ export default function Strumplate({
     }
   }, [strumplateDiv]);
 
-  const onMouseMove = throttle((e: React.TouchEvent) => {
-    e.preventDefault();
-    
-    for (let i = 0; i< e.changedTouches.length; i++) {
-        const touch = e.changedTouches.item(i);
-
-        onSegmentStrum(
-          Math.round(clamp(
-            ((touch.clientY - rect.current.y) / rect.current?.height) * numSegments,
-            0,
-            numSegments
-          )
-        ));
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (rect.current) {
+      const strummedSegment = Math.round(
+        clamp(
+          ((e.clientY - rect.current.y) / rect.current?.height) * numSegments,
+          0,
+          numSegments
+        )
+      );
+      if (strummedSegment != lastStrummedSegment.current) {
+        lastStrummedSegment.current = strummedSegment;
+        onSegmentStrum(strummedSegment);
+      }
     }
-
-  }, 20);
+  };
 
   return (
     <div
       ref={strumplateDiv}
       className="strumplate"
-    //   onMouseMoveCapture={onMouseMove}
-      onTouchMoveCapture={onMouseMove}
+      onPointerMove={onPointerMove}
+      onPointerDown={onPointerMove}
     >
       {Array.from({ length: numSegments }).map((_, i) => (
         <div key={i} data-i={i} />
