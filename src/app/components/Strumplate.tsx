@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import clamp from "lodash/clamp";
 
 export default function Strumplate({
@@ -21,7 +21,7 @@ export default function Strumplate({
     }
   }, [strumplateDiv]);
 
-  const onPointerMove = (e: React.PointerEvent) => {
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (rect.current) {
       const strummedSegment = Math.round(
         clamp(
@@ -35,7 +35,7 @@ export default function Strumplate({
         onSegmentStrum(strummedSegment);
       }
     }
-  };
+  }, []);
 
   return (
     <div

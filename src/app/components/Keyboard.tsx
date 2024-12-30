@@ -91,6 +91,9 @@ export default function Keyboard() {
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const keydownListener = useCallback((event: { code: string }) => {
+    if (!started) {
+      setStarted(true);
+    }
     setPressedKey(event.code);
   }, []);
 
@@ -135,7 +138,6 @@ export default function Keyboard() {
           },
         }).toDestination();
 
-        synth.triggerAttackRelease("C4", "8n");
         synthRef.current = synth;
       })();
     }
@@ -147,10 +149,9 @@ export default function Keyboard() {
 
   const onSegmentStrum = useCallback(
     (i: number) => {
-      if (synthRef.current) {
-
-         chordType = chordType ||  'major';
-         note = note || 'C';
+      if (synthRef.current && chordType && note) {
+        chordType = chordType;
+        note = note;
 
         const degrees = Chord.degrees(chordType, `${note}4`);
 
