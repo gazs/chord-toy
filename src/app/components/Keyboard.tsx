@@ -173,12 +173,6 @@ export default function Keyboard() {
       </label>
 
       <div className="synth">
-        {!started && (
-          <button onClick={onStart} className="start">
-            start
-          </button>
-        )}
-
         <div className="keyboard2">
           <div className="body">
             {keyboard2.map((column, i) => (
