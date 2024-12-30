@@ -91,9 +91,6 @@ export default function Keyboard() {
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const keydownListener = useCallback((event: { code: string }) => {
-    if (!started) {
-      setStarted(true);
-    }
     setPressedKey(event.code);
   }, []);
 
@@ -102,6 +99,7 @@ export default function Keyboard() {
   }, []);
 
   let { chordType, note } = keyCodeToNote(pressedKey);
+
 
   useEffect(() => {
     if (synthRef.current) {
@@ -147,57 +145,59 @@ export default function Keyboard() {
     setStarted(true);
   };
 
-  const onSegmentStrum = useCallback(
-    (i: number) => {
-      if (synthRef.current && chordType && note) {
-        chordType = chordType;
-        note = note;
+  const onSegmentStrum = useCallback((i: number) => {
+    if (synthRef.current && chordType && note) {
+      const degrees = Chord.degrees(chordType, `${note}4`);
 
-        const degrees = Chord.degrees(chordType, `${note}4`);
-
-        synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
-      }
-    },
-    [chordType, note]
-  );
+      synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
+    }
+  }, [ chordType, note]);
 
   return (
     <>
-      <label>
-        <input
-          type="checkbox"
-          checked={organ}
-          onChange={(e) => setOrgan(e.target.checked)}
-        />
-        organ
-      </label>
+      {!started ? (
+        <button className="start" onClick={onStart}>start</button>
+      ) : (
+        <>
+          <label>
+            <input
+              type="checkbox"
+              checked={organ}
+              onChange={(e) => setOrgan(e.target.checked)}
+            />
+            organ
+          </label>
 
-      <div className="synth">
-        <div className="keyboard2">
-          <div className="body">
-            {keyboard2.map((column, i) => (
-              <div className="column" key={i}>
-                <div className="heading">
-                  <div>{notes[i]}</div>
-                </div>
-                {column.map((key) => {
-                  const isPressed = pressedKey == key;
+          <div className="synth">
+            <div className="keyboard2">
+              <div className="body">
+                {keyboard2.map((column, i) => (
+                  <div className="column" key={i}>
+                    <div className="heading">
+                      <div>{notes[i]}</div>
+                    </div>
+                    {column.map((key) => {
+                      const isPressed = pressedKey == key;
 
-                  return (
-                    <div
-                      key={key}
-                      className={classNames("key", { "is-pressed": isPressed })}
-                      onPointerDown={() => keydownListener({ code: key })}
-                      onPointerUp={() => keyupListener({ code: key })}
-                    />
-                  );
-                })}
+                      return (
+                        <div
+                          key={key}
+                          className={classNames("key", {
+                            "is-pressed": isPressed,
+                          })}
+                          onPointerDown={() => keydownListener({ code: key })}
+                          onPointerUp={() => keyupListener({ code: key })}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
           </div>
-        </div>
-        <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
-      </div>
+        </>
+      )}
     </>
   );
 }
