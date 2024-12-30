@@ -14,6 +14,9 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  user-select: none;
+  touch-action: none;
+  overscroll-behavior: none;
 }
 
 body {
@@ -32,25 +35,14 @@ body {
 
 .synth {
   display: flex;
-}
-
-
-.keyboard {
-  display: grid;
-  gap: 10px;
-  flex-direction: column;
-}
-
-.row {
-  display: flex;
-  gap: 10px;
+  gap: 20px;
 }
 
 .key {
   border: 1px solid black;
-  width: 30px;
-  height: 40px;
-  transform: skew(-10deg, -10deg) rotate(10deg);
+  min-width: 40px;
+  min-height: 70px; 
+  /* transform: skew(-10deg, -10deg) rotate(10deg); */
   background-color: white;
   border-radius: 5px;
 }
@@ -69,15 +61,16 @@ button.start {
 
 .strumplate {
   width: 200px;
+  height: 100vh;
   
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 
 }
 
 .strumplate div {
   width: 100%;
-  height: 20px;
+  flex: 1;
   border-bottom: 1px solid black;
 }
 
@@ -85,9 +78,8 @@ button.start {
 .keyboard2 {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  transform: skew(10deg, 10deg) rotate(-10deg);
-  padding-left:100px;
+  gap: 10px;
+  /* transform: skew(10deg, 10deg) rotate(-10deg); */
   padding-top: 20px;
 }
 
@@ -97,16 +89,17 @@ button.start {
   display: flex;
   gap: 20px;
 }
-
-.keyboard2 .heading div {
-  width: 30px;
-
+.keyboard2 .body {
+    flex-basis:1;
 }
 
 .keyboard2 .column {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
 
   border: 1px solid blue;
 }

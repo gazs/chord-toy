@@ -98,7 +98,7 @@ export default function Keyboard() {
     setPressedKey(undefined);
   }, []);
 
-  const { chordType, note } = keyCodeToNote(pressedKey);
+  let { chordType, note } = keyCodeToNote(pressedKey);
 
   useEffect(() => {
     if (synthRef.current) {
@@ -145,13 +145,20 @@ export default function Keyboard() {
     setStarted(true);
   };
 
-  const onSegmentStrum = (i: number) => {
-    if (synthRef.current && chordType && note) {
-      const degrees = Chord.degrees(chordType, `${note}4`);
+  const onSegmentStrum = useCallback(
+    (i: number) => {
+      if (synthRef.current) {
 
-      synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
-    }
-  };
+         chordType = chordType ||  'major';
+         note = note || 'C';
+
+        const degrees = Chord.degrees(chordType, `${note}4`);
+
+        synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
+      }
+    },
+    [chordType, note]
+  );
 
   return (
     <>
@@ -172,14 +179,12 @@ export default function Keyboard() {
         )}
 
         <div className="keyboard2">
-          <div className="heading">
-            {notes.map((note) => (
-              <div key={note}>{note}</div>
-            ))}
-          </div>
           <div className="body">
             {keyboard2.map((column, i) => (
               <div className="column" key={i}>
+                <div className="heading">
+                  <div>{notes[i]}</div>
+                </div>
                 {column.map((key) => {
                   const isPressed = pressedKey == key;
 
@@ -187,10 +192,8 @@ export default function Keyboard() {
                     <div
                       key={key}
                       className={classNames("key", { "is-pressed": isPressed })}
-                      onTouchStart={() => keydownListener({ code: key })}
-                      onTouchEnd={() => keyupListener({ code: key })}
-                      onMouseDown={() => keydownListener({ code: key })}
-                      onMouseUp={() => keyupListener({ code: key })}
+                      onPointerDown={() => keydownListener({ code: key })}
+                      onPointerUp={() => keyupListener({ code: key })}
                     />
                   );
                 })}
