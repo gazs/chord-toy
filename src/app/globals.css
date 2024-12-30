@@ -91,3 +91,7 @@ button.start {
 
   border: 1px solid blue;
 }
+
+label {
+  display: block;
+}

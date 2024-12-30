@@ -88,6 +88,8 @@ export default function Keyboard() {
   const [organ, setOrgan] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | undefined>();
 
+  const [sustain, setSustain] = useState(0.3);
+
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const keydownListener = useCallback((event: { code: string }) => {
@@ -135,12 +137,23 @@ export default function Keyboard() {
           oscillator: {
             partials: [0, 2, 3, 4],
           },
+          envelope: {
+            sustain
+          }
         }).toDestination();
 
         synthRef.current = synth;
       })();
     }
   }, [started]);
+
+  useEffect(() => {
+    synthRef.current?.set({
+      envelope: {
+        sustain,
+      },
+    });
+  }, [sustain]);
 
   const onStart = () => {
     setStarted(true);
@@ -165,15 +178,6 @@ export default function Keyboard() {
         </button>
       ) : (
         <>
-          <label>
-            <input
-              type="checkbox"
-              checked={organ}
-              onChange={(e) => setOrgan(e.target.checked)}
-            />
-            organ
-          </label>
-
           <div className="synth">
             <div className="keyboard2">
               <div className="body">
@@ -201,6 +205,28 @@ export default function Keyboard() {
               </div>
             </div>
             <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
+          </div>
+
+          <div className="controls">
+            <label>
+              <input
+                type="checkbox"
+                checked={organ}
+                onChange={(e) => setOrgan(e.target.checked)}
+              />
+              organ
+            </label>
+            <label>
+              sustain
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.1}
+                onChange={(e) => setSustain(e.target.valueAsNumber)}
+                value={sustain}
+              ></input>{" "}
+            </label>
           </div>
         </>
       )}
