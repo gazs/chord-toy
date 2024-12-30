@@ -162,14 +162,16 @@ export default function Keyboard() {
 
   return (
     <>
-      <label>
-        <input
-          type="checkbox"
-          checked={organ}
-          onChange={(e) => setOrgan(e.target.checked)}
-        />
-        organ
-      </label>
+      <div className="organ-toggle">
+        <label>
+          <input
+            type="checkbox"
+            checked={organ}
+            onChange={(e) => setOrgan(e.target.checked)}
+          />
+          organ
+        </label>
+      </div>
 
       <div className="synth">
         {!started && (

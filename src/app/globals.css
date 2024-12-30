@@ -33,16 +33,25 @@ body {
   margin: 0;
 }
 
+.organ-toggle {
+  padding: 1rem;
+}
+
+.organ-toggle input {
+  margin-right: 0.5rem;
+}
+
 .synth {
   display: flex;
-  gap: 20px;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 .key {
   border: 1px solid black;
   min-width: 40px;
   min-height: 70px; 
-  /* transform: skew(-10deg, -10deg) rotate(10deg); */
+  transform: skew(-2deg, -2deg) rotate(2deg);
   background-color: white;
   border-radius: 5px;
 }
@@ -77,9 +86,9 @@ button.start {
 
 .keyboard2 {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   gap: 10px;
-  /* transform: skew(10deg, 10deg) rotate(-10deg); */
   padding-top: 20px;
 }
 
@@ -89,17 +98,23 @@ button.start {
   display: flex;
   gap: 20px;
 }
+
+.keyboard2 .heading {
+  transform: skew(-2deg, -2deg) rotate(2deg);
+}
+
 .keyboard2 .body {
-    flex-basis:1;
+  
 }
 
 .keyboard2 .column {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
-  width: 100%;
   height: 100%;
-  padding: 5px;
+  padding: 0.45rem;
+  transform: skew(2deg, 2deg) rotate(-2deg);
 
-  border: 1px solid blue;
+  border: 2px solid rgba(0,0,255,0.4);
 }
