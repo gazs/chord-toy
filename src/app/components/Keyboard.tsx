@@ -91,7 +91,9 @@ export default function Keyboard() {
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const keydownListener = useCallback((event: { code: string }) => {
-    setPressedKey(event.code);
+    if (!pressedKey) {
+      setPressedKey(event.code);
+    }
   }, []);
 
   const keyupListener = useCallback((_event: { code: string }) => {
@@ -99,7 +101,6 @@ export default function Keyboard() {
   }, []);
 
   let { chordType, note } = keyCodeToNote(pressedKey);
-
 
   useEffect(() => {
     if (synthRef.current) {
@@ -145,18 +146,23 @@ export default function Keyboard() {
     setStarted(true);
   };
 
-  const onSegmentStrum = useCallback((i: number) => {
-    if (synthRef.current && chordType && note) {
-      const degrees = Chord.degrees(chordType, `${note}4`);
+  const onSegmentStrum = useCallback(
+    (i: number) => {
+      if (synthRef.current && chordType && note) {
+        const degrees = Chord.degrees(chordType, `${note}4`);
 
-      synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
-    }
-  }, [ chordType, note]);
+        synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
+      }
+    },
+    [`${chordType} ${note}`]
+  );
 
   return (
     <>
       {!started ? (
-        <button className="start" onClick={onStart}>start</button>
+        <button className="start" onClick={onStart}>
+          start
+        </button>
       ) : (
         <>
           <label>
