@@ -1,11 +1,12 @@
-
 html,
 body {
+  --blue: oklch(47.18% 0.1718 277.94 / 75.66%);
   max-width: 100vw;
   overflow-x: hidden;
   user-select: none;
   touch-action: none;
   overscroll-behavior: none;
+  background-color: oklch(94.51% 0.0214 108);
 }
 
 body {
@@ -38,12 +39,13 @@ body {
 }
 
 .key {
-  border: 1px solid black;
+  border: 2px solid oklch(63.35% 0.0516 108);
   transform: skew(-2deg, -2deg) rotate(2deg);
-  background-color: white;
+  background-color: oklch(96.44% 0.017 108);
   border-radius: 5px;
   width: 100%;
   aspect-ratio: 1/1.2;
+  /* box-shadow: okclh(0, 0, 0, 0.2) 0px 0px 10px; */
 }
 .key.is-pressed {
   background: black;
@@ -60,7 +62,7 @@ button.start {
 }
 
 .strumplate-container {
-  border: 2px solid rgba(0,0,255,0.4);
+  border: 2px solid var(--blue);
   padding: 1rem;
 }
 
@@ -97,6 +99,8 @@ button.start {
 .keyboard2 .heading {
   transform: skew(-2deg, -2deg) rotate(2deg);
   width: 1rem;
+  color: var(--blue);
+  font-weight: bold;
 }
 
 .keyboard2 .body {
@@ -112,7 +116,8 @@ button.start {
   height: 100%;
   padding: 0.45rem;
   transform: skew(2deg, 2deg) rotate(-2deg);
-  border: 2px solid rgba(0,0,255,0.4);
+  /* border: 2px solid rgba(0,0,255,0.4); */
+  border: 2px solid var(--blue);
 }
 
 .controls {
