@@ -72,12 +72,14 @@ button.start {
   
   display: flex;
   flex-direction: row;
+  gap: 1rem;
 }
 
 .strumplate div {
   width: 100%;
   flex: 1;
-  border-right: 1px solid black;
+  /* border-right: 1px solid black; */
+  background-color: oklch(97.03% 0.0055 108);
 }
 
 
