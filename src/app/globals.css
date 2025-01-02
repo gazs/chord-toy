@@ -32,17 +32,18 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-
-  max-width: 800px;
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .key {
   border: 1px solid black;
-  min-height: 70px; 
   transform: skew(-2deg, -2deg) rotate(2deg);
   background-color: white;
   border-radius: 5px;
   width: 100%;
+  aspect-ratio: 1/1.2;
 }
 .key.is-pressed {
   background: black;
@@ -58,13 +59,17 @@ button.start {
   right: 0px;
 }
 
+.strumplate-container {
+  border: 2px solid rgba(0,0,255,0.4);
+  padding: 1rem;
+}
+
 .strumplate {
   width: 100%;
   height: 200px;
   
   display: flex;
   flex-direction: row;
-
 }
 
 .strumplate div {
@@ -103,13 +108,26 @@ button.start {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 3rem;
   height: 100%;
   padding: 0.45rem;
   transform: skew(2deg, 2deg) rotate(-2deg);
   border: 2px solid rgba(0,0,255,0.4);
 }
 
-label {
+.controls {
+  padding: 0 40px;
+  display: flex;
+}
+
+.controls div {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.controls input[type="range"] {
   display: block;
 }

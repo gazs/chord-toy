@@ -215,57 +215,65 @@ export default function Keyboard() {
       ) : (
         <>
           <div className="synth">
-            <div className="keyboard2">
-              <div className="body">
-                {keyboard2.map((column, i) => (
-                  <div className="column" key={i}>
-                    <div className="heading">
-                      <div>{notes[i]}</div>
-                    </div>
-                    {column.map((key) => {
-                      const isPressed = pressedKey == key;
+            <div className="keyboard-container">
+              <div className="keyboard2">
+                <div className="body">
+                  {keyboard2.map((column, i) => (
+                    <div className="column" key={i}>
+                      <div className="heading">
+                        <div>{notes[i]}</div>
+                      </div>
+                      {column.map((key) => {
+                        const isPressed = pressedKey == key;
 
-                      return (
-                        <div
-                          key={key}
-                          className={classNames("key", {
-                            "is-pressed": isPressed,
-                          })}
-                          onPointerDown={() => keydownListener({ code: key })}
-                          onPointerUp={() => keyupListener({ code: key })}
-                        />
-                      );
-                    })}
-                  </div>
-                ))}
+                        return (
+                          <div
+                            key={key}
+                            className={classNames("key", {
+                              "is-pressed": isPressed,
+                            })}
+                            onPointerDown={() => keydownListener({ code: key })}
+                            onPointerUp={() => keyupListener({ code: key })}
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
+            <div className="strumplate-container">
+              <Strumplate onSegmentStrum={onSegmentStrum}></Strumplate>
+            </div>
           </div>
 
           <div className="controls">
-            <label>
-              organ vol
-              <input
-                type="range"
-                value={organVolume}
-                min={-50}
-                max={0}
-                step={0.1}
-                onChange={(e) => setOrganVolume(e.target.valueAsNumber)}
-              />
-            </label>
-            <label>
-              strum vol
-              <input
-                type="range"
-                min={-50}
-                max={0}
-                step={0.1}
-                onChange={(e) => setStrumVolume(e.target.valueAsNumber)}
-                value={strumVolume}
-              ></input>
-            </label>
+            <div>
+              <label>
+                organ vol
+                <input
+                  type="range"
+                  value={organVolume}
+                  min={-50}
+                  max={0}
+                  step={0.1}
+                  onChange={(e) => setOrganVolume(e.target.valueAsNumber)}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                strum vol
+                <input
+                  type="range"
+                  min={-50}
+                  max={0}
+                  step={0.1}
+                  onChange={(e) => setStrumVolume(e.target.valueAsNumber)}
+                  value={strumVolume}
+                ></input>
+              </label>
+            </div>
           </div>
         </>
       )}
