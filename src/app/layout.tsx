@@ -4,7 +4,6 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Little chord synth",
 };
-
  
 export const viewport: Viewport = {
   width: 'device-width',

@@ -1,14 +1,3 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 html,
 body {
@@ -20,8 +9,6 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -43,8 +30,10 @@ body {
 
 .synth {
   display: flex;
-  gap: 1rem;
-  padding: 1rem;
+  flex-direction: column;
+  gap: 20px;
+
+  max-width: 800px;
 }
 
 .key {
@@ -62,25 +51,26 @@ body {
 
 
 button.start {
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   position: absolute;
+  top: 0;
   right: 0px;
 }
 
 .strumplate {
-  width: 200px;
-  height: 100vh;
+  width: 100%;
+  height: 200px;
   
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 
 }
 
 .strumplate div {
   width: 100%;
   flex: 1;
-  border-bottom: 1px solid black;
+  border-right: 1px solid black;
 }
 
 
@@ -115,6 +105,9 @@ button.start {
   height: 100%;
   padding: 0.45rem;
   transform: skew(2deg, 2deg) rotate(-2deg);
-
   border: 2px solid rgba(0,0,255,0.4);
+}
+
+label {
+  display: block;
 }
