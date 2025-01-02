@@ -6,6 +6,9 @@ import * as Tone from "tone";
 import { Chord } from "tonal";
 import Strumplate from "./Strumplate";
 
+const ORGAN_OCTAVE = 3;
+const STRUM_OCTAVE = 4;
+
 const keyboard = [
   [
     "Digit1",
@@ -112,19 +115,6 @@ export default function Keyboard() {
 
   let { chordType, note } = keyCodeToNote(pressedKey);
 
-  useEffect(() => {
-    if (organSynthRef.current) {
-      organSynthRef.current.releaseAll();
-
-      if (chordType && note) {
-        const notes = Chord.notes(chordType, note);
-
-        for (const note of notes) {
-          organSynthRef.current.triggerAttack(`${note}3`);
-        }
-      }
-    }
-  }, [chordType, note, pressedKey]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownListener);
@@ -186,10 +176,25 @@ export default function Keyboard() {
     setStarted(true);
   };
 
+  useEffect(() => {
+    if (organSynthRef.current) {
+      organSynthRef.current.releaseAll();
+
+      if (chordType && note) {
+        const notes = Chord.notes(chordType, note);
+
+        for (const note of notes) {
+          organSynthRef.current.triggerAttack(`${note}${ORGAN_OCTAVE}`);
+        }
+      }
+    }
+  }, [chordType, note, pressedKey]);
+
+
   const onSegmentStrum = useCallback(
     (i: number) => {
       if (synthRef.current && chordType && note) {
-        const degrees = Chord.degrees(chordType, `${note}4`);
+        const degrees = Chord.degrees(chordType, `${note}${STRUM_OCTAVE}`);
 
         synthRef.current.triggerAttackRelease(degrees(i + 1), "8n");
       }
