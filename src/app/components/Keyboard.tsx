@@ -84,12 +84,13 @@ const keyCodeToNote = (code?: string) => {
 };
 
 export default function Keyboard() {
-  const [started, setStarted] = useState(false);
-  const [organ, setOrgan] = useState(false);
+  const [started, setStarted] = useState(Tone.context.state === "running");
   const [pressedKey, setPressedKey] = useState<string | undefined>();
 
+  const [organVolume, setOrganVolume] = useState(-20);
   const [sustain, setSustain] = useState(0.3);
 
+  const organSynthRef = useRef<Tone.PolySynth | null>(null);
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const keydownListener = useCallback((event: { code: string }) => {
@@ -105,14 +106,14 @@ export default function Keyboard() {
   let { chordType, note } = keyCodeToNote(pressedKey);
 
   useEffect(() => {
-    if (synthRef.current) {
-      synthRef.current.releaseAll();
+    if (organSynthRef.current) {
+      organSynthRef.current.releaseAll();
 
-      if (chordType && note && organ) {
+      if (chordType && note) {
         const notes = Chord.notes(chordType, note);
 
         for (const note of notes) {
-          synthRef.current.triggerAttack(`${note}4`);
+          organSynthRef.current.triggerAttack(`${note}4`);
         }
       }
     }
@@ -133,19 +134,38 @@ export default function Keyboard() {
       (async () => {
         await Tone.start();
 
-        const synth = new Tone.PolySynth(Tone.Synth, {
-          oscillator: {
-            partials: [0, 2, 3, 4],
-          },
+        const vibrato = new Tone.Vibrato(10, 0.1).toDestination();
+
+        const synth = new Tone.PolySynth(Tone.FMSynth, {
           envelope: {
-            sustain
-          }
+            attack: 0.01,
+            decay: 0,
+            sustain,
+            release: 0.5,
+          },
+        }).connect(vibrato);
+
+        organSynthRef.current = new Tone.PolySynth(Tone.FMSynth, {
+          envelope: {
+            attack: 0.01,
+            decay: 0,
+            sustain,
+            release: 0.5,
+          },
+          volume: organVolume
         }).toDestination();
 
         synthRef.current = synth;
       })();
     }
   }, [started]);
+
+  useEffect(() => {
+    console.log(organSynthRef.current?.volume);
+    organSynthRef.current?.set({
+      volume: organVolume,
+    });
+  }, [organVolume]);
 
   useEffect(() => {
     synthRef.current?.set({
@@ -209,12 +229,15 @@ export default function Keyboard() {
 
           <div className="controls">
             <label>
+              organ vol
               <input
-                type="checkbox"
-                checked={organ}
-                onChange={(e) => setOrgan(e.target.checked)}
+                type="range"
+                value={organVolume}
+                min={-50}
+                max={0}
+                step={0.1}
+                onChange={(e) => setOrganVolume(e.target.valueAsNumber)}
               />
-              organ
             </label>
             <label>
               sustain

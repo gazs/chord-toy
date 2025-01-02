@@ -14,4 +14,6 @@ Toggle "organ" checkbox to have keys play the given chord by themselves.
 
 - make it work on ipad
 - make it pretty and more fun to use
+- multitouch on strum plate
+- 
 - remove need for start button

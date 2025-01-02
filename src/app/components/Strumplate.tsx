@@ -25,7 +25,7 @@ export default function Strumplate({
     if (rect.current) {
       const strummedSegment = Math.round(
         clamp(
-          ((e.clientY - rect.current.y) / rect.current?.height) * numSegments,
+          ((e.clientX - rect.current.x) / rect.current?.width) * numSegments,
           0,
           numSegments
         )
