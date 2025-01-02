@@ -84,11 +84,18 @@ const keyCodeToNote = (code?: string) => {
 };
 
 export default function Keyboard() {
+
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const [started, setStarted] = useState(Tone.context.state === "running");
   const [pressedKey, setPressedKey] = useState<string | undefined>();
 
   const [organVolume, setOrganVolume] = useState(-20);
-  const [sustain, setSustain] = useState(0.3);
+  const [strumVolume, setStrumVolume] = useState(0);
 
   const organSynthRef = useRef<Tone.PolySynth | null>(null);
   const synthRef = useRef<Tone.PolySynth | null>(null);
@@ -113,7 +120,7 @@ export default function Keyboard() {
         const notes = Chord.notes(chordType, note);
 
         for (const note of notes) {
-          organSynthRef.current.triggerAttack(`${note}4`);
+          organSynthRef.current.triggerAttack(`${note}3`);
         }
       }
     }
@@ -140,16 +147,17 @@ export default function Keyboard() {
           envelope: {
             attack: 0.01,
             decay: 0,
-            sustain,
+            sustain: 0.3,
             release: 0.5,
           },
+          volume: strumVolume
         }).connect(vibrato);
 
         organSynthRef.current = new Tone.PolySynth(Tone.FMSynth, {
           envelope: {
             attack: 0.01,
             decay: 0,
-            sustain,
+            sustain: 0.3,
             release: 0.5,
           },
           volume: organVolume
@@ -161,7 +169,6 @@ export default function Keyboard() {
   }, [started]);
 
   useEffect(() => {
-    console.log(organSynthRef.current?.volume);
     organSynthRef.current?.set({
       volume: organVolume,
     });
@@ -169,11 +176,11 @@ export default function Keyboard() {
 
   useEffect(() => {
     synthRef.current?.set({
-      envelope: {
-        sustain,
-      },
+      volume: strumVolume,
     });
-  }, [sustain]);
+  }, [strumVolume]);
+
+
 
   const onStart = () => {
     setStarted(true);
@@ -184,11 +191,15 @@ export default function Keyboard() {
       if (synthRef.current && chordType && note) {
         const degrees = Chord.degrees(chordType, `${note}4`);
 
-        synthRef.current.triggerAttackRelease(degrees(i + 1), "16n");
+        synthRef.current.triggerAttackRelease(degrees(i + 1), "8n");
       }
     },
     [`${chordType} ${note}`]
   );
+  
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <>
@@ -240,15 +251,15 @@ export default function Keyboard() {
               />
             </label>
             <label>
-              sustain
+              strum vol
               <input
                 type="range"
-                min={0}
-                max={1}
+                min={-50}
+                max={0}
                 step={0.1}
-                onChange={(e) => setSustain(e.target.valueAsNumber)}
-                value={sustain}
-              ></input>{" "}
+                onChange={(e) => setStrumVolume(e.target.valueAsNumber)}
+                value={strumVolume}
+              ></input>
             </label>
           </div>
         </>
