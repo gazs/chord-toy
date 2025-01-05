@@ -1,12 +1,15 @@
 html,
 body {
   --blue: oklch(47.18% 0.1718 277.94 / 75.66%);
+  --skew: skew(10deg, 10deg) rotate(-10deg);
+  --negativeSkew: skew(-10deg, -10deg) rotate(10deg);
   max-width: 100vw;
   overflow-x: hidden;
   user-select: none;
   touch-action: none;
   overscroll-behavior: none;
   background-color: oklch(94.51% 0.0214 108);
+  height: 100%;
 }
 
 body {
@@ -40,15 +43,15 @@ body {
 
 .key {
   border: 2px solid oklch(63.35% 0.0516 108);
-  transform: skew(-2deg, -2deg) rotate(2deg);
+  transform: var(--negativeSkew);
   background-color: oklch(96.44% 0.017 108);
   border-radius: 5px;
   width: 100%;
   aspect-ratio: 1/1.2;
-  /* box-shadow: okclh(0, 0, 0, 0.2) 0px 0px 10px; */
+  box-shadow: oklch(63.35% 0.0516 108) -2px 2px 0px;
 }
 .key.is-pressed {
-  background: black;
+  background: oklch(63.35% 0.0516 108);
 }
 
 
@@ -99,7 +102,7 @@ button.start {
 }
 
 .keyboard2 .heading {
-  transform: skew(-2deg, -2deg) rotate(2deg);
+  transform: var(--negativeSkew);
   width: 1rem;
   color: var(--blue);
   font-weight: bold;
@@ -116,8 +119,8 @@ button.start {
   align-items: center;
   gap: 3rem;
   height: 100%;
-  padding: 0.45rem;
-  transform: skew(2deg, 2deg) rotate(-2deg);
+  /* padding: 0.45rem; */
+  transform: var(--skew);
   /* border: 2px solid rgba(0,0,255,0.4); */
   border: 2px solid var(--blue);
 }
