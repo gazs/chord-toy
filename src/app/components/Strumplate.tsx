@@ -35,7 +35,7 @@ export default function Strumplate({
         onSegmentStrum(strummedSegment);
       }
     }
-  }, [onSegmentStrum]);
+  }, [numSegments, onSegmentStrum]);
 
   return (
     <div

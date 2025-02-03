@@ -9,51 +9,6 @@ import Strumplate from "./Strumplate";
 const ORGAN_OCTAVE = 3;
 const STRUM_OCTAVE = 4;
 
-const keyboard = [
-  [
-    "Digit1",
-    "Digit2",
-    "Digit3",
-    "Digit4",
-    "Digit5",
-    "Digit6",
-    "Digit7",
-    "Digit8",
-    "Digit9",
-    "Digit0",
-    "Minus",
-    "Equal",
-  ],
-  [
-    "KeyQ",
-    "KeyW",
-    "KeyE",
-    "KeyR",
-    "KeyT",
-    "KeyY",
-    "KeyO",
-    "KeyU",
-    "KeyI",
-    "KeyP",
-    "BracketLeft",
-    "BracketRight",
-  ],
-  [
-    "KeyA",
-    "KeyS",
-    "KeyD",
-    "KeyF",
-    "KeyG",
-    "KeyH",
-    "KeyJ",
-    "KeyK",
-    "KeyL",
-    "Semicolon",
-    "Quote",
-    "Backslash",
-  ],
-];
-
 const rows = ["major", "minor", "major seventh"];
 const notes = ["Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#"];
 
@@ -72,22 +27,93 @@ const keyboard2 = [
   ["Equal", "BracketRight", "Backslash"],
 ];
 
-const keyCodeToNote = (code?: string) => {
-  for (const row in keyboard) {
-    const index = keyboard[row].findIndex((keycode) => code === keycode);
-    if (index > -1) {
-      return { note: notes[index], chordType: rows[row] };
-    }
+const keyboard3 = [
+  "Digit1",
+  "Digit2",
+  "Digit3",
+  "Digit4",
+  "Digit5",
+  "Digit6",
+  "Digit7",
+  "Digit8",
+  "Digit9",
+  "Digit0",
+  "Minus",
+  "Equal",
+  /**/
+  "KeyQ",
+  "KeyW",
+  "KeyE",
+  "KeyR",
+  "KeyT",
+  "KeyY",
+  "KeyO",
+  "KeyU",
+  "KeyI",
+  "KeyP",
+  "BracketLeft",
+  "BracketRight",
+  /**/
+  "KeyA",
+  "KeyS",
+  "KeyD",
+  "KeyF",
+  "KeyG",
+  "KeyH",
+  "KeyJ",
+  "KeyK",
+  "KeyL",
+  "Semicolon",
+  "Quote",
+  "Backslash",
+];
+
+const keyCodeToNote = (code: string) => {
+  if (code) {
+    return {
+      note: notes[keyboard3.indexOf(code) % 12],
+    };
   }
 
   return {
     note: undefined,
-    chordType: undefined,
   };
 };
 
-export default function Keyboard() {
+const pressedKeysToChordType = (pressedKeys: Array<string>) => {
+  const pressedRows = pressedKeys.map((key) =>
+    Math.floor(keyboard3.indexOf(key) / 12)
+  );
+  if (pressedRows.length == 1) {
+    if (pressedRows[0] === 0) {
+      return "major";
+    }
+    if (pressedRows[0] === 1) {
+      return "minor";
+    }
+    if (pressedRows[0] === 2) {
+      return "seventh";
+    }
+  }
+  if (pressedRows.length === 2) {
+    if (pressedRows.includes(0) && pressedRows.includes(2)) {
+      return "major seventh";
+    }
+    if (pressedRows.includes(1) && pressedRows.includes(2)) {
+      return "minor seventh";
+    }
+    if (pressedRows.includes(0) && pressedRows.includes(1)) {
+      return "diminished";
+    }
+  }
+  if (pressedRows.length === 3) {
+    return "augmented";
+  }
 
+  
+};
+
+export default function Keyboard() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -95,7 +121,7 @@ export default function Keyboard() {
   }, []);
 
   const [started, setStarted] = useState(Tone.context.state === "running");
-  const [pressedKey, setPressedKey] = useState<string | undefined>();
+  const [pressedKeys, setPressedKeys] = useState<Array<string>>([]);
 
   const [organVolume, setOrganVolume] = useState(-20);
   const [strumVolume, setStrumVolume] = useState(0);
@@ -103,28 +129,36 @@ export default function Keyboard() {
   const organSynthRef = useRef<Tone.PolySynth | null>(null);
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
-  const keydownListener = useCallback((event: { code: string }) => {
-    if (!pressedKey) {
-      setPressedKey(event.code);
-    }
-  }, []);
+  const keydownListener = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.getModifierState("Meta") || event.getModifierState("Control")) {
+        return;
+      }
 
-  const keyupListener = useCallback((_event: { code: string }) => {
-    setPressedKey(undefined);
-  }, []);
+      if (!pressedKeys.includes(event.code)) {
+        const { note } = keyCodeToNote(event.code);
+        const { note: pressedNote } = keyCodeToNote(pressedKeys[0]);
+        if (!pressedNote || note === pressedNote) {
+          setPressedKeys([...pressedKeys, event.code]);
+        }
+      } else {
+        setPressedKeys(pressedKeys.filter((key) => key != event.code));
+      }
+    },
+    [pressedKeys]
+  );
 
-  let { chordType, note } = keyCodeToNote(pressedKey);
+  const { note } = keyCodeToNote(pressedKeys[0]);
 
+  const chordType = pressedKeysToChordType(pressedKeys);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownListener);
-    document.addEventListener("keyup", keyupListener);
 
     return () => {
       document.removeEventListener("keydown", keydownListener);
-      document.removeEventListener("keyup", keyupListener);
     };
-  }, [keydownListener, keyupListener]);
+  }, [keydownListener]);
 
   useEffect(() => {
     if (started) {
@@ -140,7 +174,7 @@ export default function Keyboard() {
             sustain: 0.3,
             release: 0.5,
           },
-          volume: strumVolume
+          volume: strumVolume,
         }).connect(vibrato);
 
         organSynthRef.current = new Tone.PolySynth(Tone.FMSynth, {
@@ -150,7 +184,7 @@ export default function Keyboard() {
             sustain: 0.3,
             release: 0.5,
           },
-          volume: organVolume
+          volume: organVolume,
         }).toDestination();
 
         synthRef.current = synth;
@@ -170,8 +204,6 @@ export default function Keyboard() {
     });
   }, [strumVolume]);
 
-
-
   const onStart = () => {
     setStarted(true);
   };
@@ -188,8 +220,7 @@ export default function Keyboard() {
         }
       }
     }
-  }, [chordType, note, pressedKey]);
-
+  }, [chordType, note]);
 
   const onSegmentStrum = useCallback(
     (i: number) => {
@@ -199,9 +230,9 @@ export default function Keyboard() {
         synthRef.current.triggerAttackRelease(degrees(i + 1), "8n");
       }
     },
-    [`${chordType} ${note}`]
+    [chordType, note]
   );
-  
+
   if (!isClient) {
     return null;
   }
@@ -224,7 +255,7 @@ export default function Keyboard() {
                         <div>{notes[i]}</div>
                       </div>
                       {column.map((key) => {
-                        const isPressed = pressedKey == key;
+                        const isPressed = pressedKeys.includes(key);
 
                         return (
                           <div
@@ -233,7 +264,6 @@ export default function Keyboard() {
                               "is-pressed": isPressed,
                             })}
                             onPointerDown={() => keydownListener({ code: key })}
-                            onPointerUp={() => keyupListener({ code: key })}
                           />
                         );
                       })}
