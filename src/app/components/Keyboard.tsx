@@ -3,13 +3,12 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import classNames from "classnames";
 import * as Tone from "tone";
-import { Chord } from "tonal";
+import { Chord, ChordType } from "tonal";
 import Strumplate from "./Strumplate";
 
 const ORGAN_OCTAVE = 3;
 const STRUM_OCTAVE = 4;
 
-const rows = ["major", "minor", "major seventh"];
 const notes = ["Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#"];
 
 const keyboard2 = [
@@ -92,7 +91,7 @@ const pressedKeysToChordType = (pressedKeys: Array<string>) => {
       return "minor";
     }
     if (pressedRows[0] === 2) {
-      return "seventh";
+      return "dominant seventh";
     }
   }
   if (pressedRows.length === 2) {
@@ -109,8 +108,6 @@ const pressedKeysToChordType = (pressedKeys: Array<string>) => {
   if (pressedRows.length === 3) {
     return "augmented";
   }
-
-  
 };
 
 export default function Keyboard() {
@@ -130,9 +127,14 @@ export default function Keyboard() {
   const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const keydownListener = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.getModifierState("Meta") || event.getModifierState("Control")) {
-        return;
+    (event: KeyboardEvent | { code: string }) => {
+      if ("getModifierState" in event) {
+        if (
+          event.getModifierState("Meta") ||
+          event.getModifierState("Control")
+        ) {
+          return;
+        }
       }
 
       if (!pressedKeys.includes(event.code)) {
@@ -140,6 +142,8 @@ export default function Keyboard() {
         const { note: pressedNote } = keyCodeToNote(pressedKeys[0]);
         if (!pressedNote || note === pressedNote) {
           setPressedKeys([...pressedKeys, event.code]);
+        } else {
+          setPressedKeys([event.code]);
         }
       } else {
         setPressedKeys(pressedKeys.filter((key) => key != event.code));
